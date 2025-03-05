@@ -1,5 +1,7 @@
+
 package com.example.smartscan;
 
+import android.content.Intent;
 import android.graphics.drawable.Animatable;
 import android.os.Bundle;
 import android.view.MotionEvent;
@@ -24,7 +26,6 @@ public class MainActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
 
-        chupAnh = findViewById(R.id.chup_anh_button);
         nhanDienVanBan = findViewById(R.id.nhan_dien_van_ban_button);
         dichVanBan = findViewById(R.id.dich_van_ban_button);
         nhanDienVatThe = findViewById(R.id.nhan_dien_vat_the_button);
@@ -39,15 +40,11 @@ public class MainActivity extends AppCompatActivity {
         animation8 = AnimationUtils.loadAnimation(this,R.anim.animation8);
         animation9 = AnimationUtils.loadAnimation(this,R.anim.animation9);
         animation10 = AnimationUtils.loadAnimation(this,R.anim.animation10);
-        chupAnh.setOnTouchListener(new View.OnTouchListener() {
+
+        nhanDienVanBan.setOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                if(motionEvent.getAction() == motionEvent.ACTION_UP) {
-                    chupAnh.startAnimation(animation1);
-                } else if(motionEvent.getAction() == motionEvent.ACTION_DOWN){
-                    chupAnh.startAnimation(animation2);
-                }
-                return true;
+            public void onClick(View view) {
+
             }
         });
         nhanDienVanBan.setOnTouchListener(new View.OnTouchListener() {
@@ -58,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
                 } else if(motionEvent.getAction() == motionEvent.ACTION_DOWN){
                     nhanDienVanBan.startAnimation(animation4);
                 }
+                startActivity(new Intent(MainActivity.this,TextRecognition.class));
                 return true;
             }
         });
@@ -94,5 +92,7 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
         });
+
     }
+
 }

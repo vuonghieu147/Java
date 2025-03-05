@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:context=".TextRecognition">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <Button
+                android:id="@+id/back_button"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/baseline_arrow_back_24"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Nhận diện văn bản"
+                android:textSize="20dp"
+                android:textColor="@color/black"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:gravity="center"/>
+        </LinearLayout>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/black"/>
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="400dp"
+            android:background="@drawable/baseline_image_24" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginTop="5dp">
+            <Button
+                android:id="@+id/chup_anh"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:background="@drawable/button"
+                android:textColor="@color/black"
+                android:text="Chụp ảnh"
+                android:layout_marginRight="30dp"/>
+            <Button
+                android:id="@+id/chon_anh"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:text="Chọn ảnh"
+                android:background="@drawable/button"
+                android:textColor="@color/black"
+                android:layout_marginLeft="30dp"/>
+        </LinearLayout>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/black"
+            android:text="Văn bản: "
+            android:textSize="20dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginStart="10dp"/>
+        <TextView
+            android:id="@+id/text_result"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:textSize="20dp"
+            android:textColor="@color/black"
+            android:background="@drawable/textresult"
+            android:layout_margin="20dp"/>
+        <Button
+            android:id="@+id/copy_text"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="60dp"
+            android:text="Sao chép nội dung"
+            android:background="@drawable/button"
+            android:textColor="@color/black"
+            android:layout_gravity="center"
+            android:padding="5dp"/>
+    </LinearLayout>
+</ScrollView>

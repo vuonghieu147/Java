@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+     android:id="@+id/nhan_dien_van_ban_button"
+     android:title=""
+     android:icon="@drawable/baseline_text_snippet_24"/>
+    <item
+        android:id="@+id/dich_van_ban_button"
+        android:title=""
+        android:icon="@drawable/baseline_translate_24"/>
+    <item
+        android:id="@+id/nhan_dien_vat_the_button"
+        android:title=""
+        android:icon="@drawable/object_recognition" />
+    <item
+        android:id="@+id/tim_kiem_thong_tin_anh_button"
+        android:title=""
+        android:icon="@drawable/image_search"/>
+</menu>
