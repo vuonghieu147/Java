@@ -13,6 +13,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
             android:orientation="horizontal">
             <Button
                 android:id="@+id/back_button"
@@ -34,8 +35,10 @@
             android:layout_height="1dp"
             android:background="@color/black"/>
         <ImageView
+            android:id="@+id/hinh_anh"
             android:layout_width="match_parent"
             android:layout_height="400dp"
+            android:layout_marginBottom="10dp"
             android:background="@drawable/baseline_image_24" />
         <LinearLayout
             android:layout_width="match_parent"
