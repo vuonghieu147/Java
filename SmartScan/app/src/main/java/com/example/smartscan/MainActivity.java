@@ -41,12 +41,6 @@ public class MainActivity extends AppCompatActivity {
         animation9 = AnimationUtils.loadAnimation(this,R.anim.animation9);
         animation10 = AnimationUtils.loadAnimation(this,R.anim.animation10);
 
-        nhanDienVanBan.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-            }
-        });
         nhanDienVanBan.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
@@ -55,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
                 } else if(motionEvent.getAction() == motionEvent.ACTION_DOWN){
                     nhanDienVanBan.startAnimation(animation4);
                 }
-                startActivity(new Intent(MainActivity.this,TextRecognition.class));
+                startActivity(new Intent(MainActivity.this,TextRecognitionActivity.class));
                 return true;
             }
         });

@@ -43,19 +43,18 @@ dependencies {
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
     // To recognize Latin script
-    implementation ("com.google.android.gms:play-services-mlkit-text-recognition:19.0.1")
+    implementation ("com.google.mlkit:text-recognition:16.0.1")
     // To recognize Chinese script
-    implementation ("com.google.android.gms:play-services-mlkit-text-recognition-chinese:16.0.1")
+    implementation ("com.google.mlkit:text-recognition-chinese:16.0.1")
     // To recognize Devanagari script
-    implementation ("com.google.android.gms:play-services-mlkit-text-recognition-devanagari:16.0.1")
+    implementation ("com.google.mlkit:text-recognition-devanagari:16.0.1")
     // To recognize Japanese script
-    implementation ("com.google.android.gms:play-services-mlkit-text-recognition-japanese:16.0.1")
+    implementation ("com.google.mlkit:text-recognition-japanese:16.0.1")
     // To recognize Korean script
-    implementation ("com.google.android.gms:play-services-mlkit-text-recognition-korean:16.0.1")
+    implementation ("com.google.mlkit:text-recognition-korean:16.0.1")
     val camerax_version = "1.5.0-alpha03"
     implementation("androidx.camera:camera-view:${camerax_version}")
     implementation("androidx.camera:camera-core:${camerax_version}")
     implementation("androidx.camera:camera-lifecycle:${camerax_version}")
     implementation ("androidx.camera:camera-camera2:${camerax_version}")
-    implementation ("com.google.mlkit:text-recognition:16.0.0")
 }
