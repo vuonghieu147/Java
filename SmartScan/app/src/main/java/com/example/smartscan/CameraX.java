@@ -8,6 +8,7 @@ import android.Manifest;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -28,11 +29,11 @@ import androidx.camera.view.PreviewView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import com.google.common.util.concurrent.ListenableFuture;
-import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
 
 public class CameraX extends AppCompatActivity {
     private Button chup;
@@ -73,7 +74,7 @@ public class CameraX extends AppCompatActivity {
                 cameraProvider = listenableFuture.get();
 
                 Preview preview = new Preview.Builder().build();
-                imageCapture = new ImageCapture.Builder().build();
+                imageCapture = new ImageCapture.Builder().setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY).build();
                 CameraSelector cameraSelector = new CameraSelector.Builder()
                         .requireLensFacing(CameraSelector.LENS_FACING_BACK)
                         .build();
@@ -107,13 +108,13 @@ public class CameraX extends AppCompatActivity {
         contentValues.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
         contentValues.put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + "/SmartScan");
         ImageCapture.OutputFileOptions outputFileOptions = new ImageCapture.OutputFileOptions.Builder(getContentResolver(), MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues).build();
-        imageCapture.takePicture(outputFileOptions,ContextCompat.getMainExecutor(this), new ImageCapture.OnImageSavedCallback(){
+        imageCapture.takePicture(outputFileOptions, Executors.newSingleThreadExecutor(), new ImageCapture.OnImageSavedCallback(){
 
             @Override
             public void onImageSaved(@NonNull ImageCapture.OutputFileResults outputFileResults) {
                 Uri anhUri = outputFileResults.getSavedUri();
                 Intent intent = new Intent();
-                intent.putExtra("anhUri",anhUri.toString());
+                intent.putExtra("anhUri", anhUri.toString());
                 setResult(RESULT_OK, intent);
                 finish();
             }

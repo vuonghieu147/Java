@@ -5,11 +5,18 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -35,11 +42,11 @@ public class TextRecognitionActivity extends AppCompatActivity {
     private Button back, chupAnh, chonAnh, saoChepVanBan;
     private TextView vanBan;
     private ImageView hinhAnh;
+    private ImageButton xoayAnh;
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == 1) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                //startActivity(new Intent(TextRecognition.this,CameraX.class));
                 layAnh.launch(new Intent(TextRecognitionActivity.this,CameraX.class));
             } else {
                 Toast.makeText(this, "Bạn cần cấp quyền để sử dụng camera", Toast.LENGTH_SHORT).show();
@@ -48,8 +55,15 @@ public class TextRecognitionActivity extends AppCompatActivity {
     }
     private final ActivityResultLauncher<PickVisualMediaRequest> chonAnhThuVien = registerForActivityResult(new ActivityResultContracts.PickVisualMedia(), uri ->{
         if (uri != null) {
+
             hinhAnh.setImageURI(uri);
-            nhanDienVanBan(uri);
+            Bitmap bitmap = null;
+            try {
+                bitmap = MediaStore.Images.Media.getBitmap(getApplicationContext().getContentResolver(),uri);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            nhanDienVanBan(bitmap);
         } else {
             Log.d("PhotoPicker", "No media selected");
         }
@@ -57,10 +71,16 @@ public class TextRecognitionActivity extends AppCompatActivity {
     private final ActivityResultLauncher<Intent> layAnh = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result ->{
         if(result.getResultCode() == RESULT_OK && result.getData() != null){
             Intent duLieu = result.getData();
-            String anhString = duLieu.getStringExtra("anhUri");
-            Uri uri = Uri.parse(anhString);
-            hinhAnh.setImageURI(uri);
-            nhanDienVanBan(uri);
+            String anh = duLieu.getStringExtra("anhUri");
+            Uri uri = Uri.parse(anh);
+            Bitmap bitmap = null;
+            try {
+                bitmap = MediaStore.Images.Media.getBitmap(getApplicationContext().getContentResolver(),uri);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            hinhAnh.setImageBitmap(bitmap);
+            nhanDienVanBan(bitmap);
         }
     });
     @Override
@@ -69,13 +89,32 @@ public class TextRecognitionActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_text_recognition);
 
-        Log.d("ActivityCheck", "1111");
         back = findViewById(R.id.back_button);
         chupAnh = findViewById(R.id.chup_anh);
         chonAnh = findViewById(R.id.chon_anh);
         saoChepVanBan = findViewById(R.id.copy_text);
         hinhAnh = findViewById(R.id.hinh_anh);
         vanBan = findViewById(R.id.text_result);
+        xoayAnh = findViewById(R.id.xoay_anh);
+        vanBan.setMovementMethod(new ScrollingMovementMethod());
+
+        vanBan.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                view.getParent().requestDisallowInterceptTouchEvent(true);
+                return false;
+            }
+        });
+        xoayAnh.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                hinhAnh.setRotation(hinhAnh.getRotation() + 90F);
+                BitmapDrawable drawable = (BitmapDrawable) hinhAnh.getDrawable();
+                Bitmap bitmap = drawable.getBitmap();
+                vanBan.setText(null);
+                nhanDienVanBan(bitmap);
+            }
+        });
 
         back.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -94,7 +133,6 @@ public class TextRecognitionActivity extends AppCompatActivity {
                         requestPermissions(permission, 1);
                     }
                     else{
-                        //startActivity(new Intent(TextRecognition.this,CameraX.class));
                         layAnh.launch(new Intent(TextRecognitionActivity.this,CameraX.class));
                     }
                 }else {
@@ -124,21 +162,18 @@ public class TextRecognitionActivity extends AppCompatActivity {
             }
         });
     }
-    private void nhanDienVanBan(Uri uri) {
-        if (uri != null) {
-            try {
-                InputImage inputImage = InputImage.fromFilePath(TextRecognitionActivity.this, uri);
-                TextRecognizer textRecognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS);
-                Task<Text> result = textRecognizer.process(inputImage).addOnSuccessListener(new OnSuccessListener<Text>() {
-                    @Override
-                    public void onSuccess(Text text) {
-                        String resultText = text.getText();
-                        vanBan.setText(resultText);
-                    }
-                });
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+    private void nhanDienVanBan(Bitmap bitmap) {
+        if (bitmap != null) {
+            InputImage inputImage = InputImage.fromBitmap(bitmap, 0);
+            TextRecognizer textRecognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS);
+            Task<Text> result = textRecognizer.process(inputImage).addOnSuccessListener(new OnSuccessListener<Text>() {
+                @Override
+                public void onSuccess(Text text) {
+
+                    String resultText = text.getText();
+                    vanBan.setText(resultText);
+                }
+            });
 
         }
     }

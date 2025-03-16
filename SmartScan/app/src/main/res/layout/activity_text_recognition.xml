@@ -54,6 +54,12 @@
                 android:textColor="@color/black"
                 android:text="Chụp ảnh"
                 android:layout_marginRight="30dp"/>
+            <ImageButton
+                android:id="@+id/xoay_anh"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/baseline_rotate_left_24"
+                android:background="@color/white"/>
             <Button
                 android:id="@+id/chon_anh"
                 android:layout_width="wrap_content"
@@ -82,7 +88,10 @@
             android:paddingStart="10dp"
             android:paddingEnd="10dp"
             android:paddingTop="5dp"
-            android:paddingBottom="5dp"/>
+            android:paddingBottom="5dp"
+            android:scrollbars="vertical"
+            android:maxLines="9999" />
+
         <Button
             android:id="@+id/copy_text"
             android:layout_width="wrap_content"
