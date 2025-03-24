@@ -57,4 +57,7 @@ dependencies {
     implementation("androidx.camera:camera-core:${camerax_version}")
     implementation("androidx.camera:camera-lifecycle:${camerax_version}")
     implementation ("androidx.camera:camera-camera2:${camerax_version}")
+    implementation ("com.google.mlkit:translate:17.0.3")
+    implementation ("com.google.android.gms:play-services-mlkit-language-id:17.0.0")
+
 }

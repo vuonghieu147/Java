@@ -33,8 +33,8 @@ import com.google.mlkit.vision.text.Text;
 import com.google.mlkit.vision.text.TextRecognition;
 import com.google.mlkit.vision.text.TextRecognizer;
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions;
-
 import java.io.IOException;
+
 
 
 
@@ -56,6 +56,7 @@ public class TextRecognitionActivity extends AppCompatActivity {
     private final ActivityResultLauncher<PickVisualMediaRequest> chonAnhThuVien = registerForActivityResult(new ActivityResultContracts.PickVisualMedia(), uri ->{
         if (uri != null) {
 
+            hinhAnh.setBackground(null);
             hinhAnh.setImageURI(uri);
             Bitmap bitmap = null;
             try {
@@ -79,6 +80,7 @@ public class TextRecognitionActivity extends AppCompatActivity {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
+            hinhAnh.setBackground(null);
             hinhAnh.setImageBitmap(bitmap);
             nhanDienVanBan(bitmap);
         }

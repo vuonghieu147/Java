@@ -61,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
                 } else if(motionEvent.getAction() == motionEvent.ACTION_DOWN){
                     dichVanBan.startAnimation(animation6);
                 }
+                startActivity(new Intent(MainActivity.this,TranslateActivity.class));
                 return true;
             }
         });
