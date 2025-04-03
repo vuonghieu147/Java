@@ -46,10 +46,10 @@ public class MainActivity extends AppCompatActivity {
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 if(motionEvent.getAction() == motionEvent.ACTION_UP) {
                     nhanDienVanBan.startAnimation(animation3);
+                    startActivity(new Intent(MainActivity.this,TextRecognitionActivity.class));
                 } else if(motionEvent.getAction() == motionEvent.ACTION_DOWN){
                     nhanDienVanBan.startAnimation(animation4);
                 }
-                startActivity(new Intent(MainActivity.this,TextRecognitionActivity.class));
                 return true;
             }
         });
@@ -58,10 +58,10 @@ public class MainActivity extends AppCompatActivity {
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 if(motionEvent.getAction() == motionEvent.ACTION_UP) {
                     dichVanBan.startAnimation(animation5);
+                    startActivity(new Intent(MainActivity.this,TranslateActivity.class));
                 } else if(motionEvent.getAction() == motionEvent.ACTION_DOWN){
                     dichVanBan.startAnimation(animation6);
                 }
-                startActivity(new Intent(MainActivity.this,TranslateActivity.class));
                 return true;
             }
         });
