@@ -66,19 +66,13 @@ public class CameraX extends AppCompatActivity {
     }
 
     private void moCamera(){
-        ListenableFuture<ProcessCameraProvider> listenableFuture =
-                ProcessCameraProvider.getInstance(this);
-
+        ListenableFuture<ProcessCameraProvider> listenableFuture = ProcessCameraProvider.getInstance(this);
         listenableFuture.addListener(() -> {
             try {
                 cameraProvider = listenableFuture.get();
-
                 Preview preview = new Preview.Builder().build();
                 imageCapture = new ImageCapture.Builder().setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY).build();
-                CameraSelector cameraSelector = new CameraSelector.Builder()
-                        .requireLensFacing(CameraSelector.LENS_FACING_BACK)
-                        .build();
-
+                CameraSelector cameraSelector = new CameraSelector.Builder().requireLensFacing(CameraSelector.LENS_FACING_BACK).build();
                 preview.setSurfaceProvider(previewView.getSurfaceProvider());
 
                 cameraProvider.unbindAll();

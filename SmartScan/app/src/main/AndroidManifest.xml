@@ -31,18 +31,23 @@
         tools:targetApi="31">
         <activity
             android:name=".ObjectDetectionActivity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".TranslateActivity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".CameraX"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".TextRecognitionActivity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".MainActivity"
+            android:screenOrientation="portrait"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

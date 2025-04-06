@@ -61,5 +61,6 @@ dependencies {
     implementation ("com.google.android.gms:play-services-mlkit-language-id:17.0.0")
     implementation ("com.google.mlkit:object-detection-custom:17.0.2")
     implementation ("com.google.mlkit:linkfirebase:17.0.0")
+    implementation ("com.google.mlkit:object-detection:17.0.2")
 
 }
