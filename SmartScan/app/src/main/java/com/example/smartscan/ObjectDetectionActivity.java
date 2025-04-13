@@ -1,55 +1,48 @@
 package com.example.smartscan;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.hardware.camera2.CameraAccessException;
-import android.hardware.camera2.CameraCharacteristics;
-import android.hardware.camera2.CameraManager;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Rect;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
-import android.util.SparseIntArray;
 import android.view.MotionEvent;
-import android.view.Surface;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
-
 import androidx.activity.EdgeToEdge;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.PickVisualMediaRequest;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.camera.core.imagecapture.JpegBytes2Disk;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
-
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.mlkit.common.model.CustomRemoteModel;
-import com.google.mlkit.common.model.DownloadConditions;
-import com.google.mlkit.common.model.LocalModel;
-import com.google.mlkit.common.model.RemoteModelManager;
-import com.google.mlkit.linkfirebase.FirebaseModelSource;
 import com.google.mlkit.vision.common.InputImage;
+import com.google.mlkit.vision.objects.DetectedObject;
+import com.google.mlkit.vision.objects.ObjectDetection;
+import com.google.mlkit.vision.objects.ObjectDetector;
 import com.google.mlkit.vision.objects.defaults.ObjectDetectorOptions;
-
+import com.google.mlkit.vision.objects.defaults.PredefinedCategory;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
 
 public class ObjectDetectionActivity extends AppCompatActivity {
     private Animation animation1, animation2, animation3, animation4;
     private Button chupAnh, chonAnh, backButton;
     private ImageView hinhAnh;
+    private InputImage inputImage;
     private final ActivityResultLauncher<Intent> layAnh = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result ->{
         if(result.getResultCode() == RESULT_OK && result.getData() != null){
             Intent duLieu = result.getData();
@@ -69,7 +62,12 @@ public class ObjectDetectionActivity extends AppCompatActivity {
         if (uri != null) {
 
             hinhAnh.setBackground(null);
-            hinhAnh.setImageURI(uri);
+            try {
+                nhanDienVatThe(uri);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            //hinhAnh.setImageURI(uri);
             Bitmap bitmap = null;
             try {
                 bitmap = MediaStore.Images.Media.getBitmap(getApplicationContext().getContentResolver(),uri);
@@ -138,46 +136,60 @@ public class ObjectDetectionActivity extends AppCompatActivity {
             }
         });
 
+    }
+    private void nhanDienVatThe(Uri uri) throws IOException {
         ObjectDetectorOptions options =
                 new ObjectDetectorOptions.Builder()
                         .setDetectorMode(ObjectDetectorOptions.SINGLE_IMAGE_MODE)
                         .enableMultipleObjects()
                         .enableClassification()  // Optional
                         .build();
-
-    }
-    private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
-    static {
-        ORIENTATIONS.append(Surface.ROTATION_0, 0);
-        ORIENTATIONS.append(Surface.ROTATION_90, 90);
-        ORIENTATIONS.append(Surface.ROTATION_180, 180);
-        ORIENTATIONS.append(Surface.ROTATION_270, 270);
-    }
-
-    /**
-     * Get the angle by which an image must be rotated given the device's current
-     * orientation.
-     */
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    private int getRotationCompensation(String cameraId, Activity activity, boolean isFrontFacing)
-            throws CameraAccessException {
-        // Get the device's current rotation relative to its "native" orientation.
-        // Then, from the ORIENTATIONS table, look up the angle the image must be
-        // rotated to compensate for the device's rotation.
-        int deviceRotation = activity.getWindowManager().getDefaultDisplay().getRotation();
-        int rotationCompensation = ORIENTATIONS.get(deviceRotation);
-
-        // Get the device's sensor orientation.
-        CameraManager cameraManager = (CameraManager) activity.getSystemService(CAMERA_SERVICE);
-        int sensorOrientation = cameraManager
-                .getCameraCharacteristics(cameraId)
-                .get(CameraCharacteristics.SENSOR_ORIENTATION);
-
-        if (isFrontFacing) {
-            rotationCompensation = (sensorOrientation + rotationCompensation) % 360;
-        } else { // back-facing
-            rotationCompensation = (sensorOrientation - rotationCompensation + 360) % 360;
+        ObjectDetector objectDetector = ObjectDetection.getClient(options);
+        try {
+            inputImage = InputImage.fromFilePath(this, uri);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        return rotationCompensation;
+
+        InputStream inputStream = getContentResolver().openInputStream(uri);
+        Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+        inputStream.close();
+        Bitmap mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
+        Canvas canvas = new Canvas(mutableBitmap);
+
+        Paint paint = new Paint();
+        paint.setColor(Color.RED);
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(1);
+        objectDetector.process(inputImage)
+                .addOnSuccessListener(new OnSuccessListener<List<DetectedObject>>() {
+                            @Override
+                            public void onSuccess(List<DetectedObject> detectedObjects) {
+                                // Task completed successfully
+                                for (DetectedObject detectedObject : detectedObjects) {
+                                    Rect boundingBox = detectedObject.getBoundingBox();
+                                    Integer trackingId = detectedObject.getTrackingId();
+                                    canvas.drawRect(boundingBox, paint);
+                                    for (DetectedObject.Label label : detectedObject.getLabels()) {
+                                        String text = label.getText();
+                                        canvas.drawText(text,boundingBox.left, boundingBox.right-10,paint);
+                                        if (PredefinedCategory.FOOD.equals(text)) {
+
+                                        }
+                                        int index = label.getIndex();
+                                        if (PredefinedCategory.FOOD_INDEX == index) {
+
+                                        }
+                                        float confidence = label.getConfidence();
+                                    }
+                                    hinhAnh.setImageBitmap(mutableBitmap);
+                                }
+                            }
+                        })
+                .addOnFailureListener(new OnFailureListener() {
+                            public void onFailure(Exception e) {
+                                // Task failed with an exception
+                            }
+                        });
     }
 }

@@ -2,7 +2,9 @@ package com.example.smartscan;
 
 
 import androidx.annotation.NonNull;
+import androidx.annotation.OptIn;
 import androidx.camera.core.Camera;
+import androidx.camera.core.ExperimentalZeroShutterLag;
 import androidx.camera.core.ImageCaptureException;
 import android.Manifest;
 import android.content.ContentValues;
@@ -37,25 +39,26 @@ import java.util.concurrent.Executors;
 
 public class CameraX extends AppCompatActivity {
     private Button chup;
-    private ImageButton imageButton;
+    private ImageButton flash;
     private ProcessCameraProvider cameraProvider;
-    private ImageCapture imageCapture;
     private PreviewView previewView;
-    private Camera camera;
+    private ImageCapture imageCapture;
     public static final int CAPTURE_MODE_MAXIMIZE_QUALITY = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_camera_x);
-        imageButton = findViewById(R.id.flash);
+        flash = findViewById(R.id.flash);
         chup = findViewById(R.id.chup_cameraX);
         previewView = findViewById(R.id.preview_view);
-        imageButton.setTag(R.drawable.baseline_flash_on_24);
+        flash.setTag(R.drawable.baseline_flash_on_24);
+
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
                 != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, 101);
         }
+
         moCamera();
         chup.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -65,29 +68,30 @@ public class CameraX extends AppCompatActivity {
         });
     }
 
+    @OptIn(markerClass = ExperimentalZeroShutterLag.class)
     private void moCamera(){
         ListenableFuture<ProcessCameraProvider> listenableFuture = ProcessCameraProvider.getInstance(this);
         listenableFuture.addListener(() -> {
             try {
                 cameraProvider = listenableFuture.get();
                 Preview preview = new Preview.Builder().build();
-                imageCapture = new ImageCapture.Builder().setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY).build();
+                imageCapture = new ImageCapture.Builder().setCaptureMode(ImageCapture.CAPTURE_MODE_ZERO_SHUTTER_LAG).setTargetRotation(previewView.getDisplay().getRotation()).build();
                 CameraSelector cameraSelector = new CameraSelector.Builder().requireLensFacing(CameraSelector.LENS_FACING_BACK).build();
                 preview.setSurfaceProvider(previewView.getSurfaceProvider());
 
                 cameraProvider.unbindAll();
-                camera = cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture);
-                imageButton.setOnClickListener(new View.OnClickListener() {
+                Camera camera = cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture);
+                flash.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        if((int)imageButton.getTag() == R.drawable.baseline_flash_off_24){
+                        if((int)flash.getTag() == R.drawable.baseline_flash_off_24){
                             camera.getCameraControl().enableTorch(true);
-                            imageButton.setBackgroundResource(R.drawable.baseline_flash_on_24);
-                            imageButton.setTag(R.drawable.baseline_flash_on_24);
-                        } else if ((int)imageButton.getTag() == R.drawable.baseline_flash_on_24) {
+                            flash.setBackgroundResource(R.drawable.baseline_flash_on_24);
+                            flash.setTag(R.drawable.baseline_flash_on_24);
+                        } else if ((int)flash.getTag() == R.drawable.baseline_flash_on_24) {
                             camera.getCameraControl().enableTorch(false);
-                            imageButton.setBackgroundResource(R.drawable.baseline_flash_off_24);
-                            imageButton.setTag(R.drawable.baseline_flash_off_24);
+                            flash.setBackgroundResource(R.drawable.baseline_flash_off_24);
+                            flash.setTag(R.drawable.baseline_flash_off_24);
                         }
                     }
                 });

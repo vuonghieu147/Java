@@ -6,8 +6,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -34,8 +34,7 @@ import com.google.mlkit.vision.text.TextRecognition;
 import com.google.mlkit.vision.text.TextRecognizer;
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions;
 import java.io.IOException;
-
-
+import java.io.InputStream;
 
 
 public class TextRecognitionActivity extends AppCompatActivity {
@@ -58,31 +57,33 @@ public class TextRecognitionActivity extends AppCompatActivity {
 
             hinhAnh.setBackground(null);
             hinhAnh.setImageURI(uri);
-            Bitmap bitmap = null;
+
+            hinhAnh.setTag(uri);
             try {
-                bitmap = MediaStore.Images.Media.getBitmap(getApplicationContext().getContentResolver(),uri);
+                nhanDienVanBan(uri);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-            nhanDienVanBan(bitmap);
         } else {
             Log.d("PhotoPicker", "No media selected");
         }
     });
+
+
     private final ActivityResultLauncher<Intent> layAnh = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result ->{
         if(result.getResultCode() == RESULT_OK && result.getData() != null){
             Intent duLieu = result.getData();
             String anh = duLieu.getStringExtra("anhUri");
             Uri uri = Uri.parse(anh);
-            Bitmap bitmap = null;
+
+            hinhAnh.setBackground(null);
+            hinhAnh.setImageURI(uri);
+            hinhAnh.setTag(uri);
             try {
-                bitmap = MediaStore.Images.Media.getBitmap(getApplicationContext().getContentResolver(),uri);
+                nhanDienVanBan(uri);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-            hinhAnh.setBackground(null);
-            hinhAnh.setImageBitmap(bitmap);
-            nhanDienVanBan(bitmap);
         }
     });
     @Override
@@ -111,10 +112,14 @@ public class TextRecognitionActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 hinhAnh.setRotation(hinhAnh.getRotation() + 90F);
-                BitmapDrawable drawable = (BitmapDrawable) hinhAnh.getDrawable();
-                Bitmap bitmap = drawable.getBitmap();
+
+                Uri uri = (Uri) hinhAnh.getTag();
                 vanBan.setText(null);
-                nhanDienVanBan(bitmap);
+                try {
+                    nhanDienVanBan(uri);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
 
@@ -164,9 +169,9 @@ public class TextRecognitionActivity extends AppCompatActivity {
             }
         });
     }
-    private void nhanDienVanBan(Bitmap bitmap) {
-        if (bitmap != null) {
-            InputImage inputImage = InputImage.fromBitmap(bitmap, 0);
+    private void nhanDienVanBan( Uri uri) throws IOException {
+        if (uri != null) {
+            InputImage inputImage = InputImage.fromFilePath(this,uri);
             TextRecognizer textRecognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS);
             Task<Text> result = textRecognizer.process(inputImage).addOnSuccessListener(new OnSuccessListener<Text>() {
                 @Override
@@ -179,5 +184,4 @@ public class TextRecognitionActivity extends AppCompatActivity {
 
         }
     }
-
 }
