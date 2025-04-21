@@ -1,3 +1,5 @@
+import com.android.build.api.dsl.AaptOptions
+
 plugins {
     alias(libs.plugins.android.application)
 }
@@ -29,6 +31,9 @@ android {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
+    buildFeatures {
+        mlModelBinding = true
+    }
 }
 
 dependencies {
@@ -39,6 +44,10 @@ dependencies {
     implementation(libs.constraintlayout)
     implementation(libs.gridlayout)
     implementation(libs.camera.extensions)
+    implementation(libs.litert)
+    implementation(libs.litert.metadata)
+    implementation(libs.litert.gpu)
+    implementation(libs.litert.support.api)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

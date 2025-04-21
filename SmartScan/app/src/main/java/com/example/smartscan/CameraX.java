@@ -11,6 +11,7 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -25,6 +26,7 @@ import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.camera.core.CameraSelector;
 import androidx.camera.core.ImageCapture;
+import androidx.camera.core.ImageProxy;
 import androidx.camera.core.Preview;
 import androidx.camera.lifecycle.ProcessCameraProvider;
 import androidx.camera.view.PreviewView;
@@ -33,7 +35,9 @@ import androidx.core.content.ContextCompat;
 import com.google.common.util.concurrent.ListenableFuture;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 
@@ -43,7 +47,7 @@ public class CameraX extends AppCompatActivity {
     private ProcessCameraProvider cameraProvider;
     private PreviewView previewView;
     private ImageCapture imageCapture;
-    public static final int CAPTURE_MODE_MAXIMIZE_QUALITY = 0;
+    private int rotation;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,17 +72,16 @@ public class CameraX extends AppCompatActivity {
         });
     }
 
-    @OptIn(markerClass = ExperimentalZeroShutterLag.class)
     private void moCamera(){
         ListenableFuture<ProcessCameraProvider> listenableFuture = ProcessCameraProvider.getInstance(this);
         listenableFuture.addListener(() -> {
             try {
                 cameraProvider = listenableFuture.get();
                 Preview preview = new Preview.Builder().build();
-                imageCapture = new ImageCapture.Builder().setCaptureMode(ImageCapture.CAPTURE_MODE_ZERO_SHUTTER_LAG).setTargetRotation(previewView.getDisplay().getRotation()).build();
+                rotation = previewView.getDisplay().getRotation();
+                imageCapture = new ImageCapture.Builder().setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY).setTargetRotation(rotation).build();
                 CameraSelector cameraSelector = new CameraSelector.Builder().requireLensFacing(CameraSelector.LENS_FACING_BACK).build();
                 preview.setSurfaceProvider(previewView.getSurfaceProvider());
-
                 cameraProvider.unbindAll();
                 Camera camera = cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture);
                 flash.setOnClickListener(new View.OnClickListener() {
@@ -101,18 +104,21 @@ public class CameraX extends AppCompatActivity {
         }, ContextCompat.getMainExecutor(this));
     }
     private void chupLuuAnh(){
-        ContentValues contentValues = new ContentValues();
-        contentValues.put(MediaStore.Images.Media.DISPLAY_NAME, "smartscan_" + System.currentTimeMillis() + ".jpg");
-        contentValues.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
-        contentValues.put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + "/SmartScan");
-        ImageCapture.OutputFileOptions outputFileOptions = new ImageCapture.OutputFileOptions.Builder(getContentResolver(), MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues).build();
+//        ContentValues contentValues = new ContentValues();
+//        contentValues.put(MediaStore.Images.Media.DISPLAY_NAME, "smartscan_" + System.currentTimeMillis() + ".jpg");
+//        contentValues.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
+//        contentValues.put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + "/SmartScan");
+        File tempFile = new File(getFilesDir(), "smartscan_" + System.currentTimeMillis() + ".jpg");
+        ImageCapture.OutputFileOptions outputFileOptions = new ImageCapture.OutputFileOptions.Builder(tempFile).build();
         imageCapture.takePicture(outputFileOptions, Executors.newSingleThreadExecutor(), new ImageCapture.OnImageSavedCallback(){
 
             @Override
             public void onImageSaved(@NonNull ImageCapture.OutputFileResults outputFileResults) {
                 Uri anhUri = outputFileResults.getSavedUri();
+                int rotation = imageCapture.getTargetRotation();
                 Intent intent = new Intent();
                 intent.putExtra("anhUri", anhUri.toString());
+                intent.putExtra("rotation", rotation);
                 setResult(RESULT_OK, intent);
                 finish();
             }
