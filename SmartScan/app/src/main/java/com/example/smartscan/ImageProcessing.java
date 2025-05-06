@@ -4,10 +4,16 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.util.Log;
+import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.mlkit.vision.common.InputImage;
+import com.google.mlkit.vision.label.ImageLabel;
+import com.google.mlkit.vision.label.ImageLabeler;
+import com.google.mlkit.vision.label.ImageLabeling;
+import com.google.mlkit.vision.label.defaults.ImageLabelerOptions;
 import com.google.mlkit.vision.text.Text;
 import com.google.mlkit.vision.text.TextRecognition;
 import com.google.mlkit.vision.text.TextRecognizer;
@@ -38,6 +44,36 @@ public class ImageProcessing {
             e.printStackTrace();
             callback.onTextRecognized(null);
         });
+    }
+    public void LabelImages(Context context, Uri uri, TextRecognitionCallback callback){
+        InputImage image = null;
+        try {
+            image = InputImage.fromFilePath(context, uri);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+//        ImageLabeler labeler = ImageLabeling.getClient(ImageLabelerOptions.DEFAULT_OPTIONS);
+        ImageLabelerOptions options = new ImageLabelerOptions.Builder().setConfidenceThreshold(0.7f).build();
+        ImageLabeler labeler = ImageLabeling.getClient(options);
+        labeler.process(image)
+                .addOnSuccessListener(new OnSuccessListener<List<ImageLabel>>() {
+                    public void onSuccess(List<ImageLabel> labels) {
+                        StringBuilder stringBuilder = new StringBuilder();
+                        for (ImageLabel label : labels) {
+                            String text = label.getText();
+                            float confidence = label.getConfidence();
+                            int index = label.getIndex();
+                            Log.d("CHECK", " text conf index: " + text + confidence + " " + index);
+                            stringBuilder.append(text).append(" ");
+                        }
+                        callback.onTextRecognized(stringBuilder.toString().trim());
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    public void onFailure( Exception e) {
+                        Toast.makeText(context, "Nhận diện thất bại", Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
     public String getLabelObject(Context context, Bitmap bitmap){
         if(bitmap == null || bitmap.isRecycled()){return "";}

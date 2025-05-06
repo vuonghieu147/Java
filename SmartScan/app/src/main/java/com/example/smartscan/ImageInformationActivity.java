@@ -163,21 +163,26 @@ public class ImageInformationActivity extends AppCompatActivity {
     }
     private void timKiemHinhAnh(Uri uri) {
         ImageProcessing imageProcessing = new ImageProcessing();
-        StringBuilder stringBuilder = new StringBuilder();
-        String label = imageProcessing.getLabelObject(this, chuyenSangBitmap(uri));
-        try {
-            imageProcessing.getTextFromImage(this, uri, new ImageProcessing.TextRecognitionCallback() {
-                @Override
-                public void onTextRecognized(String text) {
-                    String string = String.valueOf(stringBuilder.append(text).append(" ").append(label));
-                    customSearchAPIRequest(ImageInformationActivity.this, string);
-//                    String encodedQuery = URLEncoder.encode(string, "UTF-8");
-//                    Log.d("CHECK","string: " + string);
+        imageProcessing.LabelImages(this, uri, new ImageProcessing.TextRecognitionCallback() {
+            @Override
+            public void onTextRecognized(String labelImage) {
+                StringBuilder stringBuilder = new StringBuilder();
+                String label = imageProcessing.getLabelObject(ImageInformationActivity.this, chuyenSangBitmap(uri));
+                try {
+                    imageProcessing.getTextFromImage(ImageInformationActivity.this, uri, new ImageProcessing.TextRecognitionCallback() {
+                        @Override
+                        public void onTextRecognized(String text) {
+                            String string = String.valueOf(stringBuilder.append(text).append(" ").append(labelImage).append(" ").append(label));
+                            customSearchAPIRequest(ImageInformationActivity.this, string);
+//                          String encodedQuery = URLEncoder.encode(string, "UTF-8");
+                            Log.d("CHECK","string: " + string);
+                        }
+                    });
+                }catch (IOException e){
+                    e.printStackTrace();
                 }
-            });
-        }catch (IOException e){
-            e.printStackTrace();
-        }
+            }
+        });
     }
     private void customSearchAPIRequest(Context context, String text) {
         String key = "AIzaSyArBSzdA7jOeEur_r4NKuST3JiQ9kFX-HQ";
