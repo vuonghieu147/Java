@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "857151547793",
+    "project_id": "timkiemthongtinanh",
+    "storage_bucket": "timkiemthongtinanh.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:857151547793:android:a529e83f97293e3e20d230",
+        "android_client_info": {
+          "package_name": "com.example.smartscan"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA6VXacjmYsc3JuAV4TV-0ttR5k1whpC94"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

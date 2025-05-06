@@ -83,6 +83,8 @@ public class MainActivity extends AppCompatActivity {
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 if(motionEvent.getAction() == motionEvent.ACTION_UP) {
                     timKiemThongTinAnh.startAnimation(animation9);
+                    startActivity(new Intent(MainActivity.this, ImageInformationActivity.class));
+
                 } else if(motionEvent.getAction() == motionEvent.ACTION_DOWN){
                     timKiemThongTinAnh.startAnimation(animation10);
                 }

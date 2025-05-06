@@ -176,7 +176,6 @@ public class TextRecognitionActivity extends AppCompatActivity {
             Task<Text> result = textRecognizer.process(inputImage).addOnSuccessListener(new OnSuccessListener<Text>() {
                 @Override
                 public void onSuccess(Text text) {
-
                     String resultText = text.getText();
                     vanBan.setText(resultText);
                 }

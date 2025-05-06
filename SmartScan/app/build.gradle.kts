@@ -2,6 +2,7 @@ import com.android.build.api.dsl.AaptOptions
 
 plugins {
     alias(libs.plugins.android.application)
+    alias(libs.plugins.google.gms.google.services)
 }
 
 android {
@@ -48,6 +49,8 @@ dependencies {
     implementation(libs.litert.metadata)
     implementation(libs.litert.gpu)
     implementation(libs.litert.support.api)
+    implementation(libs.firebase.crashlytics.buildtools)
+    //implementation(libs.firebase.ml.vision)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
@@ -68,8 +71,10 @@ dependencies {
     implementation ("androidx.camera:camera-camera2:${camerax_version}")
     implementation ("com.google.mlkit:translate:17.0.3")
     implementation ("com.google.android.gms:play-services-mlkit-language-id:17.0.0")
-    implementation ("com.google.mlkit:object-detection-custom:17.0.2")
     implementation ("com.google.mlkit:linkfirebase:17.0.0")
-    implementation ("com.google.mlkit:object-detection:17.0.2")
 
+    implementation("com.android.volley:volley:1.2.1")
+    implementation ("com.google.code.gson:gson:2.13.1")
+
+    implementation ("com.google.mlkit:image-labeling:17.0.9")
 }

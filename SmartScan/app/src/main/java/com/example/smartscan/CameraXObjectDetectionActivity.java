@@ -125,7 +125,6 @@ public class CameraXObjectDetectionActivity extends AppCompatActivity {
         ByteBuffer byteBuffer = image.getPlanes()[0].getBuffer();
         Bitmap bitmap = Bitmap.createBitmap(imageProxy.getWidth(), imageProxy.getHeight(), Bitmap.Config.ARGB_8888);
         bitmap.copyPixelsFromBuffer(byteBuffer);
-
         return bitmap;
     }
     public static Bitmap rotateBitmapLeft(Bitmap source) {
