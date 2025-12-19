@@ -93,6 +93,7 @@ public class ImageProcessing {
                     }
                 }
             }
+            Log.d("CHECK","ten object: " + stringBuilder.toString().trim());
             return stringBuilder.toString().trim();
         }catch (Exception e){
             e.printStackTrace();

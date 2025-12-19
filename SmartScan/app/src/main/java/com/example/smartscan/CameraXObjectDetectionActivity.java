@@ -27,6 +27,8 @@ import androidx.camera.core.ExperimentalGetImage;
 import androidx.camera.core.ImageAnalysis;
 import androidx.camera.core.ImageProxy;
 import androidx.camera.core.Preview;
+import androidx.camera.core.resolutionselector.ResolutionSelector;
+import androidx.camera.core.resolutionselector.ResolutionStrategy;
 import androidx.camera.lifecycle.ProcessCameraProvider;
 import androidx.camera.view.PreviewView;
 import androidx.core.content.ContextCompat;
@@ -78,12 +80,19 @@ public class CameraXObjectDetectionActivity extends AppCompatActivity {
         listenableFuture.addListener(() -> {
             try {
                 cameraProvider = listenableFuture.get();
+                Size resolution = new Size(720, 1280);
+
+                ResolutionSelector resolutionSelector = new ResolutionSelector.Builder()
+                        .setResolutionStrategy(
+                                new ResolutionStrategy(resolution, ResolutionStrategy.FALLBACK_RULE_CLOSEST_HIGHER_THEN_LOWER)
+                        )
+                        .build();
                 rotation = previewView.getDisplay().getRotation();
-                Preview preview = new Preview.Builder().setTargetRotation(rotation).build();
+                Preview preview = new Preview.Builder().setTargetRotation(rotation).setResolutionSelector(resolutionSelector).build();
 
                 ImageAnalysis imageAnalysis = new ImageAnalysis.Builder().setTargetRotation(rotation)
                         .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
-                        .setOutputImageFormat(ImageAnalysis.OUTPUT_IMAGE_FORMAT_RGBA_8888)
+                        .setOutputImageFormat(ImageAnalysis.OUTPUT_IMAGE_FORMAT_RGBA_8888).setResolutionSelector(resolutionSelector)
                         .build();
                 CameraSelector cameraSelector = new CameraSelector.Builder().requireLensFacing(cameraSau).build();
                 imageAnalysis.setAnalyzer(detectionExecutor, new ImageAnalysis.Analyzer() {
@@ -93,13 +102,14 @@ public class CameraXObjectDetectionActivity extends AppCompatActivity {
                         float rotationDegrees = previewView.getRotation();//imageProxy.getImageInfo().getRotationDegrees();
                         Log.d("CHECK", "rotation: " + rotationDegrees);
                         Log.d("CHECK", "chieu cao va rong: " + imageProxy.getHeight() + imageProxy.getWidth());
+                        Log.d("CHECK", "chieu1 cao va rong1: " + previewView.getHeight() + previewView.getWidth());
                         Bitmap imageProxyToBitmap = imageProxyToBitmap(imageProxy);
                         Bitmap temp = rotateBitmapLeft(imageProxyToBitmap);
                         List<Yolov11.DetectionResult> resultList = yolov11.detect(temp);
                         List<Yolov11.DetectionResult> finalResults = yolov11.applyNMS(resultList, 0.4f);
                         List<Yolov11.DetectionResult> resizedResults = new ArrayList<>();
                         for(Yolov11.DetectionResult result: finalResults){
-                            RectF box = resizeImage(previewView.getHeight(),previewView.getWidth(),imageProxy.getWidth(), imageProxy.getHeight(),result.box);
+                            RectF box = resizeImage(previewView.getHeight(),previewView.getWidth(),temp.getHeight(), temp.getWidth(),result.box);
                             Yolov11.DetectionResult newResult = new Yolov11.DetectionResult( box,result.classId, result.score);
                             resizedResults.add(newResult);
                         }

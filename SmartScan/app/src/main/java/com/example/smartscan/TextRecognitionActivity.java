@@ -35,6 +35,7 @@ import com.google.mlkit.vision.text.TextRecognizer;
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
 
 public class TextRecognitionActivity extends AppCompatActivity {
@@ -169,18 +170,43 @@ public class TextRecognitionActivity extends AppCompatActivity {
             }
         });
     }
-    private void nhanDienVanBan( Uri uri) throws IOException {
+    private void nhanDienVanBan(Uri uri) throws IOException {
         if (uri != null) {
-            InputImage inputImage = InputImage.fromFilePath(this,uri);
+            InputImage inputImage = InputImage.fromFilePath(this, uri);
             TextRecognizer textRecognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS);
             Task<Text> result = textRecognizer.process(inputImage).addOnSuccessListener(new OnSuccessListener<Text>() {
                 @Override
                 public void onSuccess(Text text) {
-                    String resultText = text.getText();
-                    vanBan.setText(resultText);
-                }
-            });
+                    StringBuilder noiText = new StringBuilder();
+                    List<Text.TextBlock> blocks = text.getTextBlocks();
 
+                    for (Text.TextBlock block : blocks) {
+                        List<Text.Line> lines = block.getLines();
+                        for (int i = 0; i < lines.size(); i++) {
+                            String lineText = lines.get(i).getText().trim();
+
+                            if (i > 0) {
+                                String prevLine = lines.get(i - 1).getText().trim();
+                                char lastChar = prevLine.charAt(prevLine.length() - 1);
+                                char firstChar = lineText.charAt(0);
+                                if (!".!?：:".contains(String.valueOf(lastChar)) && Character.isLowerCase(firstChar)) {
+                                    noiText.append(" ").append(lineText);
+                                    continue;
+                                }
+                            }
+                            if (noiText.length() > 0) {
+                                noiText.append("\n");
+                            }
+                            noiText.append(lineText);
+                        }
+                    }
+                    vanBan.setText(noiText.toString());
+                }
+            }).addOnFailureListener(e -> {
+                e.printStackTrace();
+                Toast.makeText(getApplicationContext(), "Nhận diện thất bại", Toast.LENGTH_SHORT).show();
+            });
         }
     }
+
 }
